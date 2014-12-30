@@ -1,52 +1,62 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 public class RubiksCube
 {
-    private IDictionary<Face, CubeFace> Faces { get; set; }
-    public enum Face { F, B, L, R, U, D }
-    public enum FaceType { Side, Top, Bottom }
+    public IDictionary<Face, CubeFace> Faces { get; set; }
 
     public RubiksCube()
     {
         Faces = new Dictionary<Face, CubeFace>();
-        Faces.Add(Face.F, new CubeFace(FaceType.Side, new[] { Face.U, Face.R, Face.D, Face.L }));
-        Faces.Add(Face.L, new CubeFace(FaceType.Side, new[] { Face.U, Face.F, Face.D, Face.B }));
-        Faces.Add(Face.R, new CubeFace(FaceType.Side, new[] { Face.U, Face.B, Face.D, Face.F }));
-        Faces.Add(Face.B, new CubeFace(FaceType.Side, new[] { Face.U, Face.L, Face.B, Face.R }));
-        Faces.Add(Face.U, new CubeFace(FaceType.Top, new[] { Face.B, Face.R, Face.F, Face.L }));
-        Faces.Add(Face.D, new CubeFace(FaceType.Bottom, new[] { Face.B, Face.R, Face.F, Face.L }));
+        Faces.Add(Face.F, new CubeFace(new Dictionary<Face, Edge>() { { Face.U, Edge.Bottom }, { Face.R, Edge.Left }, { Face.D, Edge.Bottom }, { Face.L, Edge.Right } }));
+        Faces.Add(Face.L, new CubeFace(new Dictionary<Face, Edge>() { { Face.U, Edge.Left }, { Face.F, Edge.Left }, { Face.D, Edge.Left }, { Face.B, Edge.Right } }));
+        Faces.Add(Face.R, new CubeFace(new Dictionary<Face, Edge>() { { Face.U, Edge.Right }, { Face.B, Edge.Left }, { Face.D, Edge.Right }, { Face.F, Edge.Right } }));
+        Faces.Add(Face.B, new CubeFace(new Dictionary<Face, Edge>() { { Face.U, Edge.Top }, { Face.L, Edge.Left }, { Face.D, Edge.Top }, { Face.R, Edge.Right } }));
+        Faces.Add(Face.U, new CubeFace(new Dictionary<Face, Edge>() { { Face.B, Edge.Top }, { Face.R, Edge.Top }, { Face.F, Edge.Top }, { Face.L, Edge.Top } }));
+        Faces.Add(Face.D, new CubeFace(new Dictionary<Face, Edge>() { { Face.B, Edge.Bottom }, { Face.R, Edge.Bottom }, { Face.F, Edge.Bottom }, { Face.L, Edge.Bottom } }));
     }
 
     public void Rotate(CubeFace face)
     {
-        if (face.FaceType == FaceType.Side)
+        face.Rotate();
+        foreach(var connection in face.Connections)
         {
-            int n = face.Values.GetLength(0);
-            for (int i = 0; i < n / 2; i++)
+            if (connection.Value == Edge.Top)
             {
-                for (int j = i; j < n - i - 1; j++)
-                {
-                    tmp=a[i][j];
-                    a[i][j]=a[j][n-i-1];
-                    a[j][n-i-1]=a[n-i-1][n-j-1];
-                    a[n-i-1][n-j-1]=a[n-j-1][i];
-                    a[n-j-1][i]=tmp;
-                }
+
             }
         }
     }
 }
 
+public enum Face { F, B, L, R, U, D }
+public enum Edge { Top, Bottom, Left, Right }
+
 public class CubeFace
 {
     public int[,] Values { get; set; }
-    public IEnumerable<char> Connections { get; set; }
-    public RubiksCube.FaceType FaceType { get; set; }
+    public IDictionary<Face, Edge> Connections { get; set; }
 
-    public CubeFace(RubiksCube.FaceType faceType, IEnumerable<RubiksCube.Face> connections)
+    public CubeFace(IDictionary<Face, Edge> connections)
     {
-        FaceType = faceType;
         Values = new int[3,3];
+        Connections = connections;
+    }
+
+    public void Rotate()
+    {
+        int n = Values.GetLength(0);
+        for (int i = 0; i < n / 2; i++)
+        {
+            for (int j = i; j < n - i - 1; j++)
+            {
+                int temp = Values[i, j];
+                Values[i, j] = Values[n - 1 - j, i];
+                Values[n - 1 - j, i] = Values[n - 1 - i, n - 1 - j];
+                Values[n - 1 - i, n - 1 - j] = Values[j, n - 1 - i];
+                Values[j, n - 1 - i] = temp;
+            }
+        }
     }
 }
 
@@ -55,5 +65,25 @@ public class Program
     public static void Main()
     {
         var cube = new RubiksCube();
+        int count = 1;
+        int[,] frontFace = new int[3, 3];
+        for (int i = 2; i >= 0; i--)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                frontFace[i, j] = count++;
+            }
+        }
+        cube.Faces[Face.F].Values = frontFace;
+        cube.Faces[Face.F].Rotate();
+
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                Console.Write(frontFace[i, j]);
+            }
+            Console.WriteLine();
+        }
     }
 }
