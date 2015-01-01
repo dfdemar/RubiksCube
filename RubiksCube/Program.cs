@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class RubiksCube
 {
@@ -16,10 +17,18 @@ public class RubiksCube
         Faces.Add(Face.D, new CubeFace());
     }
 
+    public void Move(IEnumerable<string> moves)
+    {
+        foreach (var move in moves)
+        {
+            Rotate((Face)Enum.Parse(typeof(Face), move));
+        }
+    }
+
     public void Rotate(Face face)
     {
         Faces[face].Rotate();
-        switch(face)
+        switch (face)
         {
             case Face.F:
                 Rotate(Faces[Face.U].Squares[2][0], Faces[Face.R].Squares[0][0], Faces[Face.D].Squares[2][0], Faces[Face.L].Squares[2][2]);
@@ -29,7 +38,7 @@ public class RubiksCube
             case Face.L:
                 Rotate(Faces[Face.U].Squares[0][0], Faces[Face.F].Squares[0][0], Faces[Face.D].Squares[2][2], Faces[Face.B].Squares[2][2]);
                 Rotate(Faces[Face.U].Squares[1][0], Faces[Face.F].Squares[1][0], Faces[Face.D].Squares[1][2], Faces[Face.B].Squares[1][2]);
-                Rotate(Faces[Face.U].Squares[2][0], Faces[Face.F].Squares[2][0], Faces[Face.D].Squares[2][2], Faces[Face.B].Squares[0][2]);
+                Rotate(Faces[Face.U].Squares[2][0], Faces[Face.F].Squares[2][0], Faces[Face.D].Squares[0][2], Faces[Face.B].Squares[0][2]);
                 break;
             case Face.R:
                 Rotate(Faces[Face.U].Squares[2][2], Faces[Face.B].Squares[0][0], Faces[Face.D].Squares[0][0], Faces[Face.F].Squares[2][2]);
@@ -83,6 +92,11 @@ public class CubeFace
         }
     }
 
+    public CubeFace(Square[][] layout)
+    {
+        Squares = layout;
+    }
+
     public void Rotate()
     {
         int n = Squares.GetLength(0);
@@ -120,16 +134,36 @@ public class Program
                 frontFace[i][j] = new Square() { Value = count++ };
             }
         }
-        cube.Faces[Face.F].Squares = frontFace;
-        cube.Rotate(Face.D);
-        cube.Rotate(Face.D);
-        cube.Rotate(Face.D);
+        cube.Faces[Face.F] = new CubeFace(frontFace);
+
+        //int num = Int32.Parse(Console.ReadLine());
+        //List<string> moves = Console.ReadLine().Split().ToList();
+        //cube.Move(moves);
+
+        //string[] results = new string[10];
+        //foreach (var kvp in cube.Faces)
+        //{
+        //    for (int i = 2; i >= 0; i--)
+        //    {
+        //        for (int j = 0; j < 3; j++)
+        //        {
+        //            results[kvp.Value.Squares[i][j].Value] = kvp.Key.ToString();
+        //        }
+        //    }
+        //}
+
+        //foreach (var value in results.Skip(1))
+        //{
+        //    Console.Write(value + " ");
+        //}
+
+        cube.Rotate(Face.L);
 
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
             {
-                Console.Write(cube.Faces[Face.L].Squares[i][j].Value);
+                Console.Write(cube.Faces[Face.D].Squares[i][j].Value);
             }
             Console.WriteLine();
         }
