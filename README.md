@@ -8,7 +8,9 @@ The purpose of the challenge was to input a series of moves and then report whic
 For example, this is what the front face looks like initially:
 
 7 8 9
+
 4 5 6
+
 1 2 3
 
 All other faces have values of zero for each of their squares.
@@ -16,13 +18,17 @@ All other faces have values of zero for each of their squares.
 If you rotated the Right face clockwise then the Front face would now look like this:
 
 7 8 0
+
 4 5 0
+
 1 2 0
 
 And the Up face would look like this:
 
 0 0 9
+
 0 0 6
+
 0 0 3
 
 So output would be:
