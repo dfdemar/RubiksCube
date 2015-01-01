@@ -8,54 +8,101 @@ public class RubiksCube
     public RubiksCube()
     {
         Faces = new Dictionary<Face, CubeFace>();
-        Faces.Add(Face.F, new CubeFace(new Dictionary<Face, Edge>() { { Face.U, Edge.Bottom }, { Face.R, Edge.Left }, { Face.D, Edge.Bottom }, { Face.L, Edge.Right } }));
-        Faces.Add(Face.L, new CubeFace(new Dictionary<Face, Edge>() { { Face.U, Edge.Left }, { Face.F, Edge.Left }, { Face.D, Edge.Left }, { Face.B, Edge.Right } }));
-        Faces.Add(Face.R, new CubeFace(new Dictionary<Face, Edge>() { { Face.U, Edge.Right }, { Face.B, Edge.Left }, { Face.D, Edge.Right }, { Face.F, Edge.Right } }));
-        Faces.Add(Face.B, new CubeFace(new Dictionary<Face, Edge>() { { Face.U, Edge.Top }, { Face.L, Edge.Left }, { Face.D, Edge.Top }, { Face.R, Edge.Right } }));
-        Faces.Add(Face.U, new CubeFace(new Dictionary<Face, Edge>() { { Face.B, Edge.Top }, { Face.R, Edge.Top }, { Face.F, Edge.Top }, { Face.L, Edge.Top } }));
-        Faces.Add(Face.D, new CubeFace(new Dictionary<Face, Edge>() { { Face.B, Edge.Bottom }, { Face.L, Edge.Bottom }, { Face.F, Edge.Bottom }, { Face.R, Edge.Bottom } }));
+        Faces.Add(Face.F, new CubeFace());
+        Faces.Add(Face.L, new CubeFace());
+        Faces.Add(Face.R, new CubeFace());
+        Faces.Add(Face.B, new CubeFace());
+        Faces.Add(Face.U, new CubeFace());
+        Faces.Add(Face.D, new CubeFace());
     }
 
-    public void Rotate(CubeFace face)
+    public void Rotate(Face face)
     {
-        face.Rotate();
-        ICollection<int[]> edges = new List<int[]>();
-        foreach(var connection in face.Connections)
+        Faces[face].Rotate();
+        switch(face)
         {
-
+            case Face.F:
+                Rotate(Faces[Face.U].Squares[2][0], Faces[Face.R].Squares[0][0], Faces[Face.D].Squares[2][0], Faces[Face.L].Squares[2][2]);
+                Rotate(Faces[Face.U].Squares[2][1], Faces[Face.R].Squares[1][0], Faces[Face.D].Squares[2][1], Faces[Face.L].Squares[1][2]);
+                Rotate(Faces[Face.U].Squares[2][2], Faces[Face.R].Squares[2][0], Faces[Face.D].Squares[2][2], Faces[Face.L].Squares[0][2]);
+                break;
+            case Face.L:
+                Rotate(Faces[Face.U].Squares[0][0], Faces[Face.F].Squares[0][0], Faces[Face.D].Squares[2][2], Faces[Face.B].Squares[2][2]);
+                Rotate(Faces[Face.U].Squares[1][0], Faces[Face.F].Squares[1][0], Faces[Face.D].Squares[1][2], Faces[Face.B].Squares[1][2]);
+                Rotate(Faces[Face.U].Squares[2][0], Faces[Face.F].Squares[2][0], Faces[Face.D].Squares[2][2], Faces[Face.B].Squares[0][2]);
+                break;
+            case Face.R:
+                Rotate(Faces[Face.U].Squares[2][2], Faces[Face.B].Squares[0][0], Faces[Face.D].Squares[0][0], Faces[Face.F].Squares[2][2]);
+                Rotate(Faces[Face.U].Squares[1][2], Faces[Face.B].Squares[1][0], Faces[Face.D].Squares[1][0], Faces[Face.F].Squares[1][2]);
+                Rotate(Faces[Face.U].Squares[0][2], Faces[Face.B].Squares[2][0], Faces[Face.D].Squares[2][0], Faces[Face.F].Squares[0][2]);
+                break;
+            case Face.B:
+                Rotate(Faces[Face.U].Squares[0][2], Faces[Face.L].Squares[0][0], Faces[Face.D].Squares[0][2], Faces[Face.R].Squares[2][2]);
+                Rotate(Faces[Face.U].Squares[0][1], Faces[Face.L].Squares[1][0], Faces[Face.D].Squares[0][1], Faces[Face.R].Squares[1][2]);
+                Rotate(Faces[Face.U].Squares[0][0], Faces[Face.L].Squares[2][0], Faces[Face.D].Squares[0][0], Faces[Face.R].Squares[0][2]);
+                break;
+            case Face.U:
+                Rotate(Faces[Face.B].Squares[0][2], Faces[Face.R].Squares[0][2], Faces[Face.F].Squares[0][2], Faces[Face.L].Squares[0][2]);
+                Rotate(Faces[Face.B].Squares[0][1], Faces[Face.R].Squares[0][1], Faces[Face.F].Squares[0][1], Faces[Face.L].Squares[0][1]);
+                Rotate(Faces[Face.B].Squares[0][0], Faces[Face.R].Squares[0][0], Faces[Face.F].Squares[0][0], Faces[Face.L].Squares[0][0]);
+                break;
+            case Face.D:
+                Rotate(Faces[Face.B].Squares[2][0], Faces[Face.L].Squares[2][0], Faces[Face.F].Squares[2][0], Faces[Face.R].Squares[2][0]);
+                Rotate(Faces[Face.B].Squares[2][1], Faces[Face.L].Squares[2][1], Faces[Face.F].Squares[2][1], Faces[Face.R].Squares[2][1]);
+                Rotate(Faces[Face.B].Squares[2][2], Faces[Face.L].Squares[2][2], Faces[Face.F].Squares[2][2], Faces[Face.R].Squares[2][2]);
+                break;
         }
+    }
+
+    private void Rotate(Square square1, Square square2, Square square3, Square square4)
+    {
+        int temp = square4.Value;
+        square4.Value = square3.Value;
+        square3.Value = square2.Value;
+        square2.Value = square1.Value;
+        square1.Value = temp;
     }
 }
 
 public enum Face { F, B, L, R, U, D }
-public enum Edge { Top, Bottom, Left, Right }
 
 public class CubeFace
 {
-    public int[][] Values { get; set; }
-    public IDictionary<Face, Edge> Connections { get; set; }
+    public Square[][] Squares { get; set; }
 
-    public CubeFace(IDictionary<Face, Edge> connections)
+    public CubeFace()
     {
-        Values = new int[3][];
-        Connections = connections;
+        Squares = new Square[3][];
+        for (int i = 0; i < 3; i++)
+        {
+            Squares[i] = new Square[3];
+            for (int j = 0; j < 3; j++)
+            {
+                Squares[i][j] = new Square();
+            }
+        }
     }
 
     public void Rotate()
     {
-        int n = Values.GetLength(0);
+        int n = Squares.GetLength(0);
         for (int i = 0; i < n / 2; i++)
         {
             for (int j = i; j < n - i - 1; j++)
             {
-                int temp = Values[i][j];
-                Values[i][j] = Values[n - 1 - j][i];
-                Values[n - 1 - j][i] = Values[n - 1 - i][n - 1 - j];
-                Values[n - 1 - i][n - 1 - j] = Values[j][n - 1 - i];
-                Values[j][n - 1 - i] = temp;
+                Square temp = Squares[i][j];
+                Squares[i][j] = Squares[n - 1 - j][i];
+                Squares[n - 1 - j][i] = Squares[n - 1 - i][n - 1 - j];
+                Squares[n - 1 - i][n - 1 - j] = Squares[j][n - 1 - i];
+                Squares[j][n - 1 - i] = temp;
             }
         }
     }
+}
+
+public class Square
+{
+    public int Value { get; set; }
 }
 
 public class Program
@@ -64,22 +111,25 @@ public class Program
     {
         var cube = new RubiksCube();
         int count = 1;
-        int[][] frontFace = new int[3][];
+        Square[][] frontFace = new Square[3][];
         for (int i = 2; i >= 0; i--)
         {
+            frontFace[i] = new Square[3];
             for (int j = 0; j < 3; j++)
             {
-                frontFace[i][j] = count++;
+                frontFace[i][j] = new Square() { Value = count++ };
             }
         }
-        cube.Faces[Face.F].Values = frontFace;
-        cube.Faces[Face.F].Rotate();
+        cube.Faces[Face.F].Squares = frontFace;
+        cube.Rotate(Face.D);
+        cube.Rotate(Face.D);
+        cube.Rotate(Face.D);
 
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
             {
-                Console.Write(frontFace[i][j]);
+                Console.Write(cube.Faces[Face.L].Squares[i][j].Value);
             }
             Console.WriteLine();
         }
